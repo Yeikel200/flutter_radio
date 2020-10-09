@@ -33,7 +33,7 @@ class RadioService(val context: Context) : Player.EventListener, AudioManager.On
         exoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector)
         exoPlayer.addListener(this)
 
-        status = PlaybackStatus.IDLE
+        status = PlaybackStatus.IDLE.toString()
     }
 
     private fun play(streamUrl: String) {
@@ -52,9 +52,9 @@ class RadioService(val context: Context) : Player.EventListener, AudioManager.On
         val uri = Uri.parse(streamUrl)
         val type = Util.inferContentType(uri)
         return when (type) {
-            C.TYPE_HLS   -> HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
+            C.TYPE_HLS -> HlsMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
             C.TYPE_OTHER -> ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
-            else         -> {
+            else -> {
                 throw IllegalStateException("Unsupported type: $type")
             }
         }
@@ -89,11 +89,15 @@ class RadioService(val context: Context) : Player.EventListener, AudioManager.On
         }
     }
 
-    fun isPlaying() : Boolean {
-        return this.status.equals(PlaybackStatus.PLAYING)
+    fun isPlaying(): Boolean {
+        return this.status == PlaybackStatus.PLAYING.toString()
     }
 
-    fun getStatus() : String = status
+    fun getStatus(): String = status
+
+    fun release() {
+        exoPlayer.release()
+    }
 
     override fun onAudioFocusChange(focusChange: Int) {
         when (focusChange) {
@@ -103,7 +107,7 @@ class RadioService(val context: Context) : Player.EventListener, AudioManager.On
             }
 
             AudioManager.AUDIOFOCUS_LOSS -> {
-                stop();
+                stop()
             }
 
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
@@ -118,11 +122,11 @@ class RadioService(val context: Context) : Player.EventListener, AudioManager.On
     }
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-        status = when(playbackState) {
-            Player.STATE_BUFFERING -> PlaybackStatus.LOADING
-            Player.STATE_ENDED -> PlaybackStatus.STOPPED
-            Player.STATE_READY -> if (playWhenReady) PlaybackStatus.PLAYING else PlaybackStatus.PAUSED
-            else -> PlaybackStatus.IDLE
+        status = when (playbackState) {
+            Player.STATE_BUFFERING -> PlaybackStatus.LOADING.toString()
+            Player.STATE_ENDED -> PlaybackStatus.STOPPED.toString()
+            Player.STATE_READY -> if (playWhenReady) PlaybackStatus.PLAYING.toString() else PlaybackStatus.PAUSED.toString()
+            else -> PlaybackStatus.IDLE.toString()
         }
 
         if (EventBus.getDefault().hasSubscriberForEvent(String::class.java))

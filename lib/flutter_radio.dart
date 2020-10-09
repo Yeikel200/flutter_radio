@@ -19,6 +19,12 @@ class FlutterRadio {
     await _channel.invokeMethod('audioStart');
   }
 
+  static Future<void> release() async
+    => await _channel.invokeMethod('release');
+
+  static Future<String> getStatus() async =>
+      await _channel.invokeMethod('getStatus');
+
   static Future<void> playOrPause({@required String url}) async {
     try {
       if (FlutterRadio._isPlaying) {
@@ -33,8 +39,7 @@ class FlutterRadio {
 
   static Future<void> play({@required String url}) async {
     try {
-      String result =
-          await _channel.invokeMethod('play', <String, dynamic>{
+      String result = await _channel.invokeMethod('play', <String, dynamic>{
         'url': url,
       });
       print('result: $result');
@@ -107,8 +112,8 @@ class FlutterRadio {
 
   static Future<String> setMeta(AudioPlayerItem item) async {
     String result = await _channel.invokeMethod('setMeta', <String, dynamic>{
-        'meta': item.toMap(),
-      });
+      'meta': item.toMap(),
+    });
     _removePlayerCallback();
     return result;
   }
@@ -120,8 +125,7 @@ class FlutterRadio {
       return result;
     }
 
-    result = await _channel
-        .invokeMethod('setVolume', <String, dynamic>{
+    result = await _channel.invokeMethod('setVolume', <String, dynamic>{
       'volume': volume,
     });
     return result;
@@ -143,7 +147,7 @@ class PlayStatus {
   }
 }
 
-class AudioPlayerItem{
+class AudioPlayerItem {
   String id;
   String url;
   String thumbUrl;
@@ -161,20 +165,19 @@ class AudioPlayerItem{
     this.duration,
     this.progress,
     this.album,
-    this.local
+    this.local,
   });
 
-  Map<String, dynamic> toMap(){
+  Map<String, dynamic> toMap() {
     return {
       'id': this.id,
       'url': this.url,
       'thumb': this.thumbUrl,
       'title': this.title,
-      'duration': this.duration != null ?this.duration.inSeconds : 0,
+      'duration': this.duration != null ? this.duration.inSeconds : 0,
       'progress': this.progress ?? 0,
       'album': this.album,
       'local': this.local
     };
   }
-
 }

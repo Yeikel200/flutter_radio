@@ -1,12 +1,10 @@
 package br.com.thyagoluciano.flutterradio.player
 
-import android.content.Context
-
-class RadioManager(private val context: Context) {
+class RadioManager(private val service: RadioService) {
 
     private var instance: RadioManager? = null
 
-    private var service = RadioService(context)
+    //private var service = RadioService(context)
 
     private var serviceBound = false
 
@@ -23,4 +21,13 @@ class RadioManager(private val context: Context) {
     fun isPlaying(): Boolean {
         return service.isPlaying()
     }
+
+    fun release() {
+        service.release()
+    }
+
+    fun getStatus(): String {
+        return service.getStatus()
+    }
+
 }

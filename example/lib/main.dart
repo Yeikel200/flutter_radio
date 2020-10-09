@@ -15,6 +15,7 @@ class _MyAppState extends State<MyApp> {
       "https://ia802708.us.archive.org/3/items/count_monte_cristo_0711_librivox/count_of_monte_cristo_001_dumas.mp3";
 
   bool isPlaying;
+  String playerStatus;
 
   @override
   void initState() {
@@ -60,9 +61,16 @@ class _MyAppState extends State<MyApp> {
               },
             ),
             Text(
-              'Check Playback Status: $isPlaying',
+              'Is Playing: $isPlaying',
               style: TextStyle(fontSize: 25.0),
-            )
+            ),
+            GestureDetector(
+              onTap: () => playingStatus(),
+              child: Text(
+                'Check Playback Status: $playerStatus',
+                style: TextStyle(fontSize: 20.0),
+              ),
+            ),
           ],
         )),
       ),
@@ -70,9 +78,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future playingStatus() async {
-    bool isP = await FlutterRadio.isPlaying();
+    final bool isP = await FlutterRadio.isPlaying();
+    final String status = await FlutterRadio.getStatus();
+
     setState(() {
       isPlaying = isP;
+      playerStatus = status;
     });
   }
 }
